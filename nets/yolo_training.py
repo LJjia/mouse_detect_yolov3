@@ -283,7 +283,6 @@ class YOLOLoss(nn.Module):
             batch_target[:, [1,3]] = targets[b][:, [1,3]] * in_h
             batch_target[:, 4] = targets[b][:, 4]
             batch_target = batch_target.cpu()
-            # TODO:这里维度需要打印清楚看看到底是做什么
             #-------------------------------------------------------#
             #   将真实框转换一个形式
             #   num_true_box, 4
