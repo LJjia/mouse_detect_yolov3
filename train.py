@@ -70,20 +70,21 @@ if __name__ == "__main__":
     #   网络一般不从0开始训练，至少会使用主干部分的权值，有些论文提到可以不用预训练，主要原因是他们 数据集较大 且 调参能力优秀。
     #   如果一定要训练网络的主干部分，可以了解imagenet数据集，首先训练分类模型，分类模型的 主干部分 和该模型通用，基于此进行训练。
     #----------------------------------------------------------------------------------------------------------------------------#
-    model_path      = 'logs/ep022-loss4.430-val_loss5.561.pth'
+    # model_path      = 'logs/ep022-loss4.430-val_loss5.561.pth'
+    model_path = 'logs/ep010-loss7.714-val_loss7.557.pth'
     # 加载已经训练好的模型
-    # model_path = 'model_data/ep003-loss6.292-val_loss5.600.pth'
+    # model_path = 'model_data/ep003-loss6.292-val_lo ss5.600.pth'
     #------------------------------------------------------#
     #   输入的shape大小，一定要是32的倍数
     #------------------------------------------------------#
-    input_shape     = [416, 416]
+    input_shape     = [608, 608]
     #----------------------------------------------------------------------------------------------------------------------------#
     #   是否使用主干网络的预训练权重，此处使用的是主干的权重，因此是在模型构建的时候进行加载的。
     #   如果设置了model_path，则主干的权值无需加载，pretrained的值无意义。
     #   如果不设置model_path，pretrained = True，此时仅加载主干开始训练。
     #   如果不设置model_path，pretrained = False，Freeze_Train = Fasle，此时从0开始训练，且没有冻结主干的过程。
     #----------------------------------------------------------------------------------------------------------------------------#
-    pretrained      = False
+    pretrained      = True
     
     #----------------------------------------------------#
     #   训练分为两个阶段，分别是冻结阶段和解冻阶段。
@@ -96,15 +97,15 @@ if __name__ == "__main__":
     #   占用的显存较小，仅对网络进行微调
     #----------------------------------------------------#
     Init_Epoch          = 0
-    Freeze_Epoch        = 5
-    Freeze_batch_size   = 32
+    Freeze_Epoch        = 0
+    Freeze_batch_size   = 16
     Freeze_lr           = 1e-3
     #----------------------------------------------------#
     #   解冻阶段训练参数
     #   此时模型的主干不被冻结了，特征提取网络会发生改变
     #   占用的显存较大，网络所有的参数都会发生改变
     #----------------------------------------------------#
-    UnFreeze_Epoch      = 15
+    UnFreeze_Epoch      = 25
     Unfreeze_batch_size = 16
     Unfreeze_lr         = 1e-4
     #------------------------------------------------------#
@@ -132,9 +133,12 @@ if __name__ == "__main__":
     #------------------------------------------------------#
     #   创建yolo模型
     #------------------------------------------------------#
-    model = YoloBody(anchors_mask, num_classes, pretrained=pretrained)
-    if model_path == '' or not pretrained:
+    model = YoloBody(anchors_mask, num_classes,net_name=YoloBody.backbone_type.ghost)
+    if model_path == '':
         weights_init(model)
+        if pretrained:
+            model.load_backbone()
+        print("not load total model weight ,b loadbackbone?",pretrained)
     if model_path != '':
         #------------------------------------------------------#
         #   权值文件请看README，百度网盘下载
@@ -244,7 +248,7 @@ if __name__ == "__main__":
 
         for epoch in range(start_epoch, end_epoch):
             # 每4轮保存一次
-            bSaveModel=(epoch%4==0) or (epoch==end_epoch-1)
+            bSaveModel=(epoch%8==0) or (epoch==end_epoch-1)
             fit_one_epoch(model_train, model, yolo_loss, loss_history, optimizer, epoch, 
                     epoch_step, epoch_step_val, gen, gen_val, end_epoch, Cuda,save_model=bSaveModel)
             lr_scheduler.step()

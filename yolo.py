@@ -26,7 +26,7 @@ class YOLO(object):
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
 
-        "model_path": 'logs/ep015-loss3.159-val_loss3.422.pth',
+        "model_path": 'logs/ep040-loss4.634-val_loss4.875.pth',
         "classes_path"      : 'model_data/voc_classes.txt',
         #---------------------------------------------------------------------#
         #   anchors_path代表先验框对应的txt文件，一般不修改。
@@ -41,7 +41,7 @@ class YOLO(object):
         #---------------------------------------------------------------------#
         #   只有得分大于置信度的预测框会被保留下来
         #---------------------------------------------------------------------#
-        "confidence"        : 0.1,
+        "confidence"        : 0.2,
         #---------------------------------------------------------------------#
         #   非极大抑制所用到的nms_iou大小
         #---------------------------------------------------------------------#
@@ -98,7 +98,7 @@ class YOLO(object):
         #---------------------------------------------------#
         #   建立yolov3模型，载入yolov3模型的权重
         #---------------------------------------------------#
-        self.net    = YoloBody(self.anchors_mask, self.num_classes)
+        self.net    = YoloBody(self.anchors_mask, self.num_classes,net_name=YoloBody.backbone_type.ghost)
         device      = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
         self.net    = self.net.eval()

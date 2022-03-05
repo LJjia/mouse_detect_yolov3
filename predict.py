@@ -12,8 +12,9 @@ from yolo import YOLO
 import os
 
 if __name__ == "__main__":
+    model_path='logs/ep025-loss5.366-val_loss5.791.pth'
     # 预测使用cpu
-    yolo = YOLO(cuda=True)
+    yolo = YOLO(cuda=False,model_path=model_path)
     #----------------------------------------------------------------------------------------------------------#
     #   mode用于指定测试的模式：
     #   'predict'表示单张图片预测，如果想对预测过程进行修改，如保存图片，截取对象等，可以先看下方详细的注释
@@ -32,6 +33,7 @@ if __name__ == "__main__":
     #   保存视频时需要ctrl+c退出或者运行到最后一帧才会完成完整的保存步骤。
     #----------------------------------------------------------------------------------------------------------#
     video_path      = "video_decode/video/mouse.MOV"
+    # video_path = "C:/Users/Administrator/Desktop/house.mp4"
     video_save_path = ""
     video_fps       = 25.0
     #-------------------------------------------------------------------------#

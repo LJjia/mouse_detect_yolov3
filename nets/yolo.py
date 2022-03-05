@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 
 from nets.darknet import darknet53
+from nets.ghostnet import GhostNet
+from nets.shuffnetv2 import shufflenet_v2_x1_0
 
 def conv2d(filter_in, filter_out, kernel_size):
     '''
@@ -58,12 +60,15 @@ def make_last_layers(filters_list, in_filters, out_filter):
     )
     return m
 
+from enum import Enum
+
 class YoloBody(nn.Module):
-    def __init__(self, anchors_mask, num_classes, pretrained = False):
+    backbone_type = Enum("backbone_type", ('ghost', 'shufflenet', 'darknet53'))
+    def __init__(self, anchors_mask, num_classes, net_name,pretrained = True):
         '''
 
         :param anchors_mask: 先验框尺寸,这里仅用到每个尺寸的特征图一共有几个先验框
-        :param num_classes:
+        :param num_classes: 种类个数如voc数据集为20
         :param pretrained:
         '''
         super(YoloBody, self).__init__()
@@ -76,10 +81,18 @@ class YoloBody(nn.Module):
         #   52x52x256->26x26x512是下采样,跨距为2,深度变深了
         #---------------------------------------------------#
 
-        # 返回dark53主骨干网络,不带特征提取层
-        self.backbone = darknet53()
-        if pretrained:
-            self.backbone.load_state_dict(torch.load("model_data/darknet53_backbone_weights.pth"))
+        if net_name==YoloBody.backbone_type.ghost:
+            self.backbone=GhostNet()
+        elif net_name==YoloBody.backbone_type.shufflenet:
+            self.backbone=shufflenet_v2_x1_0()
+        elif net_name==YoloBody.backbone_type.darknet53:
+            # 返回dark53主骨干网络,不带特征提取层
+            self.backbone = darknet53()
+        else:
+            print('input correct net name .you input',net_name)
+            raise ValueError("input incorrect net name")
+        self.net_name = net_name
+
 
         #---------------------------------------------------#
         #   out_filters : [64, 128, 256, 512, 1024]
@@ -153,4 +166,12 @@ class YoloBody(nn.Module):
         out2 = self.last_layer2(x2_in)
         # 对应分别为13x13x75 26x26x75 52x52x75的特征图
         return out0, out1, out2
-
+    def load_backbone(self):
+        if self.net_name==YoloBody.backbone_type.ghost:
+            self.backbone.load_model("model_data/change_official_ghost.pth")
+        if self.net_name==YoloBody.backbone_type.shufflenet:
+            self.backbone.load_model("model_data/change_official_ghost.pth")
+        elif self.net_name==YoloBody.backbone_type.darknet53:
+            self.backbone.load_state_dict(torch.load("model_data/darknet53_backbone_weights.pth"))
+        else:
+            print("net name %s net weight"%self.net_name)
