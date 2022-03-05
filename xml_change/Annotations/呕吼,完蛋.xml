@@ -1,0 +1,14 @@
+<annotation>
+	<folder>JPEGImages</folder>
+	<filename>呕吼,完蛋.jpg</filename>
+	<path>/Users/ljjia/PythonCode/selfProject/mouse_detect/xml_change/呕吼,完蛋.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>635</width>
+		<height>500</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+</annotation>
