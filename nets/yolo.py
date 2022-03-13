@@ -170,7 +170,7 @@ class YoloBody(nn.Module):
         if self.net_name==YoloBody.backbone_type.ghost:
             self.backbone.load_model("model_data/change_official_ghost.pth")
         if self.net_name==YoloBody.backbone_type.shufflenet:
-            self.backbone.load_model("model_data/change_official_ghost.pth")
+            self.backbone.load_model("model_data/shufflenetv2_x1.pth")
         elif self.net_name==YoloBody.backbone_type.darknet53:
             self.backbone.load_state_dict(torch.load("model_data/darknet53_backbone_weights.pth"))
         else:
